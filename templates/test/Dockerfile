@@ -3,12 +3,13 @@ FROM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN amazon-linux-extras enable docker && \
     yum install -y jq containerd wget which && \
     wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
-    chmod a+x /usr/local/bin/yq
+    chmod a+x /usr/local/bin/yq && \
+    yum clean all
 
 ENV IMDS_ENDPOINT=127.0.0.1:1338
 COPY --from=aemm /ec2-metadata-mock /sbin/ec2-metadata-mock
-RUN mkdir -p /etc/systemd/system
-RUN mkdir -p /etc/eks/containerd
+RUN mkdir -p /etc/systemd/system && \
+    mkdir -p /etc/eks/containerd
 COPY ubuntu/runtime/ /etc/eks/
 COPY shared/runtime/ /etc/eks/
 COPY ubuntu/runtime/containerd-config.toml ubuntu/runtime/kubelet-containerd.service ubuntu/runtime/pull-sandbox-image.sh ubuntu/runtime/sandbox-image.service /etc/eks/containerd/

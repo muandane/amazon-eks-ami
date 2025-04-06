@@ -32,10 +32,7 @@ runs:
         go install github.com/aws/aws-k8s-tester/...@HEAD
 
         case "${{ inputs.os_distro }}" in
-          al2)
-            KUBETEST2_ARGS="--user-data-format=bootstrap.sh"
-            ;;
-          al2023)
+          ubuntu)
             KUBETEST2_ARGS="--addons=vpc-cni:latest --tune-vpc-cni --user-data-format=nodeadm"
             ;;
           *)

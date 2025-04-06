@@ -34,11 +34,11 @@ async function bot(core, github, context, uuid) {
         return;
     }
     const uniqueCommands = [...new Set(commands.map(command => typeof command))];
-    if (uniqueCommands.length != commands.length) {
+    if (uniqueCommands.length !== commands.length) {
         replyToCommand(github, payload, `@${author} you can't use the same command more than once! 🙅`);
         return;
     }
-    console.log(commands.length + " command(s) found in comment body");
+    console.log(`${commands.length} command(s) found in comment body`);
 
     for (const command of commands) {
         const reply = await command.run(author, github);
@@ -171,10 +171,9 @@ class CICommand {
     // a map of file path prefixes to OS distros that are associated with the file paths
     // a value of "*" implies multiple OS distros are associated with the path, and we should just rely on the workflow's default
     osDistroPathPrefixHints = {
-        "templates/al2/": "al2",
-        "templates/al2023/": "al2023",
+        "templates/ubuntu/": "ubuntu",
         "templates/shared/": "*",
-        "nodeadm/": "al2023",
+        "nodeadm/": "ubuntu",
     };
 
     async guessOsDistrosForChangedFiles(github) {
@@ -195,7 +194,7 @@ class CICommand {
             console.log("changed files matched a prefix mapped to the wildcard, not attempting to guess os_distros!");
             return null;
         }
-        if (osDistros.size == 0) {
+        if (osDistros.size === 0) {
             return null;
         }
         return Array.from(osDistros).join(',');
@@ -240,10 +239,10 @@ class CICommand {
                 inputs[`${goal}_arguments`] = args;
             }
         }
-        if (!inputs.hasOwnProperty('os_distros')) {
+        if (!('os_distros' in inputs)) {
             const osDistros = await this.guessOsDistrosForChangedFiles(github);
             if (osDistros != null) {
-                inputs['os_distros'] = osDistros;
+                inputs.os_distros = osDistros;
             }
         }
         console.log(`Dispatching workflow with inputs: ${JSON.stringify(inputs)}`);
