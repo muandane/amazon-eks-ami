@@ -9,14 +9,14 @@ ENV IMDS_ENDPOINT=127.0.0.1:1338
 COPY --from=aemm /ec2-metadata-mock /sbin/ec2-metadata-mock
 RUN mkdir -p /etc/systemd/system
 RUN mkdir -p /etc/eks/containerd
-COPY al2/runtime/ /etc/eks/
+COPY ubuntu/runtime/ /etc/eks/
 COPY shared/runtime/ /etc/eks/
-COPY al2/runtime/containerd-config.toml al2/runtime/kubelet-containerd.service al2/runtime/pull-sandbox-image.sh al2/runtime/sandbox-image.service /etc/eks/containerd/
-COPY al2/runtime/kubelet-config.json /etc/kubernetes/kubelet/kubelet-config.json
-COPY al2/runtime/kubelet-kubeconfig /var/lib/kubelet/kubeconfig
-COPY al2/runtime/ecr-credential-provider-config.json /etc/eks/image-credential-provider/config.json
+COPY ubuntu/runtime/containerd-config.toml ubuntu/runtime/kubelet-containerd.service ubuntu/runtime/pull-sandbox-image.sh ubuntu/runtime/sandbox-image.service /etc/eks/containerd/
+COPY ubuntu/runtime/kubelet-config.json /etc/kubernetes/kubelet/kubelet-config.json
+COPY ubuntu/runtime/kubelet-kubeconfig /var/lib/kubelet/kubeconfig
+COPY ubuntu/runtime/ecr-credential-provider-config.json /etc/eks/image-credential-provider/config.json
 COPY test/entrypoint.sh /entrypoint.sh
-COPY al2/runtime/bin/* /usr/bin/
+COPY ubuntu/runtime/bin/* /usr/bin/
 COPY shared/runtime/bin/* /usr/bin/
 COPY test/mocks/ /sbin/
 ENTRYPOINT ["/entrypoint.sh"]
