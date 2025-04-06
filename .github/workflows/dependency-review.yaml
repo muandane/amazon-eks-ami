@@ -1,0 +1,33 @@
+name: "Dependency Review"
+on:
+  pull_request:
+    branches:
+      - "main"
+permissions:
+  contents: read
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+      - uses: actions/dependency-review-action@3b139cfc5fae8b618d3eae3675e383bb1769c019 # 4.5.0
+  gosec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # 5.4.0
+        with:
+          go-version-file: 'nodeadm/go.mod'
+      - run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - run: gosec -exclude-generated ./...
+        working-directory: nodeadm
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+      - uses: golang/govulncheck-action@b625fbe08f3bccbe446d94fbf87fcc875a4f50ee # 1.0.4
+        with:
+          work-dir: ./nodeadm
+          go-version-file: nodeadm/go.mod
+          cache: false
+          repo-checkout: false

@@ -1,0 +1,18 @@
+# This file is for Amazon internal build processes
+
+# Copyright 2019 Amazon.com, Inc. or its affiliates.
+# SPDX-License-Identifier: Apache-2.0
+
+# declare all the necessary files/dirs used to AMI here. These files will be built into archive and then build AMI based on it.
+dependencies:
+  source:
+    dirs:
+      - src: log-collector-script/
+      - src: nodeadm/
+      - src: templates/
+    files:
+      - src: Makefile
+      - src: .git-commit
+archive:
+  name: amazon-eks-ami.tar.gz
+  type: tgz

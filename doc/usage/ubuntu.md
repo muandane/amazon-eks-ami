@@ -1,0 +1,95 @@
+# Ubuntu 22.04 Jammy
+
+## Template variables
+
+<!-- template-variable-table-boundary -->
+| Variable | Description |
+| - | - |
+| `ami_component_description` |  |
+| `ami_description` |  |
+| `ami_name` |  |
+| `ami_regions` |  |
+| `ami_users` |  |
+| `arch` |  |
+| `associate_public_ip_address` |  |
+| `aws_access_key_id` |  |
+| `aws_region` |  |
+| `aws_secret_access_key` |  |
+| `aws_session_token` |  |
+| `binary_bucket_name` |  |
+| `binary_bucket_region` |  |
+| `containerd_version` |  |
+| `creator` |  |
+| `enable_accelerator` | Vendor that provides the GPU or accelerator hardware. Currently we support Neuron and NVIDIA. |
+| `enable_efa` | Valid options are ```true``` or ```false```. Whether or not to install the software needed to use AWS Elastic Fabric Adapter (EFA) network interfaces. |
+| `enable_fips` | Install openssl and enable fips related kernel parameters |
+| `encrypted` |  |
+| `iam_instance_profile` | The name of an IAM instance profile to launch the EC2 instance with. |
+| `instance_type` |  |
+| `kms_key_id` |  |
+| `kubernetes_build_date` |  |
+| `kubernetes_version` |  |
+| `launch_block_device_mappings_volume_size` |  |
+| `nodeadm_build_image` | Image to use as a build environment for nodeadm |
+| `nvidia_driver_major_version` | To be used only when ```enable_accelerator = nvidia```. Driver version to install, depends on what is available in NVIDIA repository. |
+| `nvidia_repository_url` | URL for the NVIDIA driver packages |
+| `pause_container_image` | Image ref for the pause container image |
+| `remote_folder` | Directory path for shell provisioner scripts on the builder instance |
+| `runc_version` |  |
+| `security_group_id` |  |
+| `source_ami_filter_name` |  |
+| `source_ami_id` |  |
+| `source_ami_owners` |  |
+| `ssh_interface` | If using ```session_manager```, you need to specify a non-minimal ami as the minimal version does not have the SSM agent installed. |
+| `ssh_username` |  |
+| `ssm_agent_version` | Version of the SSM agent to install from the S3 bucket provided by the SSM agent project, such as ```latest```. If empty, the latest version of the SSM agent available in the Ubuntu core repositories will be installed. |
+| `subnet_id` |  |
+| `temporary_key_pair_type` |  |
+| `temporary_security_group_source_cidrs` |  |
+| `user_data_file` | Path to a file that will be used for the user data when launching the instance. |
+| `volume_type` |  |
+| `working_dir` | Directory path for ephemeral resources on the builder instance |
+<!-- template-variable-table-boundary -->
+
+## Accelerated images
+
+One can build images that contain Neuron or Nvidia drivers and runtime configuration. To build Neuron image execute:
+
+```
+make k8s=1.29 os_distro=ubuntu enable_accelerator=neuron enable_efa=true
+```
+
+To build NVIDIA image execute:
+```
+make k8s=1.29 os_distro=ubuntu enable_accelerator=nvidia enable_efa=true
+```
+
+One can pass the NVIDIA driver major version using the following:
+```
+make k8s=1.29 os_distro=ubuntu enable_accelerator=nvidia enable_efa=true nvidia_driver_major_version=560
+```
+To see which driver versions are available, one can check the NVIDIA Ubuntu [repository](https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/).
+
+## Pause Container Image
+
+Since [PR #2000](https://github.com/awslabs/amazon-eks-ami/pull/2000), the pause
+container image is no longer pulled in at runtime on Ubuntu 22.04. `nodeadm` uses a
+static pause container reference to populate the
+[`sandbox_image`](https://github.com/containerd/containerd/blob/963c2160485631c3d4c1068aa28cea34c884a347/docs/cri/config.md?plain=1#L314-L315)
+field of the containerd config.toml, which is baked into the AMI during the
+build based on the packer template variable `pause_container_image`.
+
+The default for `pause_container_image` points to an EKS-owned ECR image, but
+you can also use another pause image entirely such as `registry.k8s.io/pause`.
+
+If you need coordinates for a different ECR image in another region, see
+https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html for a list
+of region-specific registries that hold identical repositories.
+
+Additionally, if you would like to use a FIPS endpoint, this will require just a
+minor change to the registry URI:
+```diff
+-<ACCOUNT_ID>.dkr.ecr.<REGION>.<DOMAIN>"
++<ACCOUNT_ID>.dkr.ecr-fips.<REGION>.<DOMAIN>"
+```
+
