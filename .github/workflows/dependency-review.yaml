@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
-      - uses: actions/dependency-review-action@ce3cf9537a52e8119d91fd484ab5b8a807627bf8 # 4.6.0
+      - uses: actions/dependency-review-action@56339e523c0409420f6c2c9a2f4292bbb3c07dd3 # 4.8.0
   gosec:
     runs-on: ubuntu-latest
     steps:
